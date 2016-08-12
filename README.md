@@ -1,6 +1,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/chavdim/qstack)](https://goreportcard.com/report/github.com/chavdim/qstack)
 # qstack
 quickly find the first stackoverflow answer from a yahoo search 
+#Instalation
+```
+go get github.com/golang/example/hello
+```
 #Uses
 >qstack export bin mac
 ```
