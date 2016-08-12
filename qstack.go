@@ -33,7 +33,12 @@ func prepareAnswer(ans string) string {
 func main() {
 	//Get args
     args := os.Args[1:]
-    searchQuery := strings.Replace(strings.Join(args[:]," "), " ", "+", -1)
+    searchQuery := "stackoverflow+"
+    searchQuery += strings.Replace(strings.Join(args[:]," "), " ", "+", -1)
+    if len(args) == 0 {
+    	fmt.Println("Please include search term. Example: qstack css add font")
+    	return
+    }
   	//
     fmt.Println("Searching for: "+searchQuery)
     //Find top stackoverflow result
@@ -44,6 +49,9 @@ func main() {
 	}
 	defer resp.Body.Close()
 	byteArray, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	html := string(byteArray[:])
 	stackUrl := getFromToStartingFrom(html,"http://stackoverflow.com","\"")
 	//
@@ -56,6 +64,9 @@ func main() {
 	}
 	defer resp.Body.Close()
 	byteArray, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	html = string(byteArray[:])
 	//Slice and display results
 	fmt.Println("ANSWER##################################################")
