@@ -20,6 +20,7 @@ func getFromToStartingFrom(text string, from string,to string,) string {
 	sub := text[i1:i2]
 	return sub
 }
+//modify answer section
 func prepareAnswer(ans string) string {
 	r := strings.Replace(ans, "<code>", "\nCODE---------------------------------------\n", -1)
 	r = strings.Replace(r, "</code>", "\nENDCODE------------------------------------\n", -1)
@@ -35,8 +36,7 @@ func main() {
     searchQuery := strings.Replace(strings.Join(args[:]," "), " ", "+", -1)
   	//
     fmt.Println("Searching for: "+searchQuery)
-
-    //Find top stackoverflow resutl
+    //Find top stackoverflow result
 	url :="https://search.yahoo.com/search?p="+searchQuery
 	resp, err := http.Get(url)
 	if err != nil {
