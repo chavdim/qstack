@@ -3,7 +3,7 @@
 quickly find the first stackoverflow answer from a yahoo search 
 #Instalation
 ```
-go get github.com/golang/example/hello
+go get github.com/chavdim/qstack
 ```
 #Uses
 >qstack export bin mac
