@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"os"
+	"errors"
+	"github.com/zserge/webview"
 )
 //string slicing 
 func getFromTo(text string, from string,to string) string {
@@ -14,22 +16,17 @@ func getFromTo(text string, from string,to string) string {
 	sub := text[i1:i2]
 	return sub
 }
-func getFromToStartingFrom(text string, from string,to string,) string {
+func getFromToStartingFrom(text string, from string,to string,) (string, error) {
 	i1 := strings.Index(text, from)
-	i2 := strings.Index(text[i1:], to) + i1
+	if i1==-1 {
+		err := errors.New("no matches found, exiting.")
+		return "", err 
+	}
+	i2 := strings.Index(text[i1:], to) + i1	
 	sub := text[i1:i2]
-	return sub
+	return sub, nil
 }
-//modify answer section
-func prepareAnswer(ans string) string {
-	r := strings.Replace(ans, "<code>", "\nCODE---------------------------------------\n", -1)
-	r = strings.Replace(r, "</code>", "\nENDCODE------------------------------------\n", -1)
-	r = strings.Replace(r, "<p>", "", -1)
-	r = strings.Replace(r, "</p>", "", -1)
-	r = strings.Replace(r, "<pre>", "", -1)
-	r = strings.Replace(r, "</pre>", "", -1)
-	return r
-}
+//
 func main() {
 	//Get args
     args := os.Args[1:]
@@ -53,32 +50,11 @@ func main() {
 		log.Fatal(err)
 	}
 	html := string(byteArray[:])
-	stackUrl := getFromToStartingFrom(html,"http://stackoverflow.com","\"")
-	//
-	fmt.Println("Source: "+stackUrl)
-	//Get stackoverflow page from to result url
-	url = stackUrl
-	resp, err = http.Get(url)
-	if err != nil {
+	stackUrl, err := getFromToStartingFrom(html,"https://stackoverflow.com/questions","\"")
+	if err!=nil{
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-	byteArray, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	html = string(byteArray[:])
-	//Slice and display results
-	fmt.Println("ANSWER##################################################")
-	fmt.Println("########################################################")
-	sub := getFromToStartingFrom(html,"class=\"answercell\"","class=\"fw\"")
-	answer := getFromTo(sub, "<div" ,  "</div>")
-	answer = prepareAnswer(answer[39:])
-	fmt.Println(answer)
-
-	fmt.Println("QUESTION################################################")
-	fmt.Println("########################################################")
-	sub = getFromTo(html,"class=\"question-hyperlink\"","id=\"mainbar\"")
-	question := getFromTo(sub, "class=\"question-hyperlink\">" ,  "</a>")
-	fmt.Println(question[27:])	
+	// displays result in webview
+	webview.Open("stackoverflow",
+		stackUrl, 800, 600, true)
 }
