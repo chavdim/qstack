@@ -9,4 +9,5 @@ go get github.com/chavdim/qstack
 ```
 #Uses
 >qstack export bin mac
+
 This opens a webview window showing the first stackoverflow answer.
