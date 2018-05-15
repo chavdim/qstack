@@ -39,7 +39,9 @@ func main() {
   	//
     fmt.Println("Searching for: "+searchQuery)
     //Find top stackoverflow result
-	url :="https://search.yahoo.com/search?p="+searchQuery
+	//url :="https://search.yahoo.com/search?p="+searchQuery
+	url :=fmt.Sprintf("https://www.google.co.jp/search?q=%s&oq=%s&aqs=chrome..69i57.31606j0j1&sourceid=chrome&ie=UTF-8", searchQuery, searchQuery)
+
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
