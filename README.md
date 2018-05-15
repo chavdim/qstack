@@ -8,6 +8,6 @@ quickly find the first stackoverflow answer from a yahoo search
 go get github.com/chavdim/qstack
 ```
 #Uses
->qstack export bin mac
+>qstack css change font
 
 This opens a webview window showing the first stackoverflow answer.
