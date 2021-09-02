@@ -3,11 +3,10 @@
 # qstack
 quickly find the first stackoverflow answer from a <s>yahoo</s> google search 
 
-#Instalation
+# Instalation
 ```
 go get github.com/chavdim/qstack
 ```
-#Uses
+# Uses
 >qstack css change font
 
-This opens a webview window showing the first stackoverflow answer.
