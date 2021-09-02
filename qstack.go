@@ -1,62 +1,88 @@
 package main
+
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"os"
-	"errors"
-	"github.com/zserge/webview"
+	"strings"
+	"github.com/rocketlaunchr/google-search"
 )
-//string slicing 
-func getFromTo(text string, from string,to string) string {
-	i1 := strings.Index(text, from)
-	i2 := strings.Index(text, to)
-	sub := text[i1:i2]
-	return sub
-}
 func getFromToStartingFrom(text string, from string,to string,) (string, error) {
 	i1 := strings.Index(text, from)
 	if i1==-1 {
-		err := errors.New("no matches found, exiting.")
-		return "", err 
+		err := errors.New("No matches found, exiting.")
+		return "", err
 	}
-	i2 := strings.Index(text[i1:], to) + i1	
+	i2 := strings.Index(text[i1:], to) + i1
 	sub := text[i1:i2]
 	return sub, nil
 }
+//modify answer section
+func prepareAnswer(ans string) string {
+	r := strings.Replace(ans, "<code>", "\nCODEBLOCK---------------------------------------\n", -1)
+	r = strings.Replace(r, "</code>", "\n------------------------------------------------\n", -1)
+	r = strings.Replace(r, "<p>", "", -1)
+	r = strings.Replace(r, "</p>", "\n", -1)
+	r = strings.Replace(r, "<pre>", "", -1)
+	r = strings.Replace(r, "</pre>", "\n", -1)
+	return r
+}
+
 //
 func main() {
 	//Get args
-    args := os.Args[1:]
-    searchQuery := "stackoverflow+"
-    searchQuery += strings.Replace(strings.Join(args[:]," "), " ", "+", -1)
-    if len(args) == 0 {
-    	fmt.Println("Please include search term. Example: qstack css add font")
-    	return
-    }
-  	//
-    fmt.Println("Searching for: "+searchQuery)
-    //Find top stackoverflow result
-	//url :="https://search.yahoo.com/search?p="+searchQuery
-	url :=fmt.Sprintf("https://www.google.co.jp/search?q=%s&oq=%s&aqs=chrome..69i57.31606j0j1&sourceid=chrome&ie=UTF-8", searchQuery, searchQuery)
+	args := os.Args[1:]
+	searchQuery := "stackoverflow "+strings.Join(args[:], " ")
+	if len(args) == 0 {
+		fmt.Println("Please include search term. Example: qstack css add font")
+		return
+	}
 
-	resp, err := http.Get(url)
+	fmt.Println("Searching for: " + searchQuery)
+
+	ctx := context.Background()
+	result, err := googlesearch.Search(ctx, searchQuery)
+	var firstStackUrlFound = ""
+	for _, s := range result {
+		if strings.Contains(s.URL, "stackoverflow") {
+			firstStackUrlFound = s.URL
+			break
+		}
+	}
+	if firstStackUrlFound == "" {
+		log.Fatal("No stack overflow page found")
+	}
+
+	fmt.Println("Source: " + firstStackUrlFound)
+	//Get stackoverflow page from to result url
+	resp, err := http.Get(firstStackUrlFound)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer resp.Body.Close()
 	byteArray, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	html := string(byteArray[:])
-	stackUrl, err := getFromToStartingFrom(html,"https://stackoverflow.com/questions","\"")
-	if err!=nil{
+
+	var html = string(byteArray[:])
+	//Slice and display results
+	fmt.Println("ANSWER##################################################")
+	//fmt.Println(html)
+
+	answer, err := getFromToStartingFrom(html, "class=\"answercell", "class=\"mt24\"")
+	if err != nil {
 		log.Fatal(err)
 	}
-	// displays result in webview
-	webview.Open("stackoverflow",
-		stackUrl, 800, 600, true)
+
+	// Custom slicing according to response dom
+	var i1 = strings.Index(answer, "itemprop=\"text\">")
+
+	answer = prepareAnswer(answer[i1+17 : (len(answer) - 18)])
+	fmt.Println(answer)
 }
