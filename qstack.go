@@ -72,7 +72,11 @@ func main() {
 
 	var html = string(byteArray[:])
 	//Slice and display results
-	fmt.Println("ANSWER##################################################")
+	fmt.Println("Question ##################################################")
+	var lastSlash = strings.LastIndex(firstStackUrlFound, "/")
+	fmt.Println(strings.Replace(firstStackUrlFound[lastSlash+1:], "-"," ", -1))
+
+	fmt.Println("Answer ##################################################")
 	//fmt.Println(html)
 
 	answer, err := getFromToStartingFrom(html, "class=\"answercell", "class=\"mt24\"")
